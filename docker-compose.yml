@@ -4,6 +4,7 @@ services:
     container_name: capjs-backend
     environment:
       - ADMIN_KEY=${ADMIN_KEY}
+      - ENABLE_ASSETS_SERVER=true
     volumes:
       - cap-data:/usr/src/app/.data
     networks:
