@@ -1,0 +1,36 @@
+name: Deploy CapJS Standalone
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Copy docker-compose.yml to server
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: docker-compose.yml
+          target: ~/capjs-backend/
+
+      - name: SSH and deploy on server
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -e
+            mkdir -p ~/capjs-backend
+            cd ~/capjs-backend
+
+            ADMIN_KEY=${{ secrets.ADMIN_KEY }} \
+            docker-compose -f docker-compose.yml up -d --force-recreate --build

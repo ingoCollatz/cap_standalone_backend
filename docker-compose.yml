@@ -1,0 +1,24 @@
+services:
+  capjs-backend:
+    image: tiago2/cap:latest
+    container_name: capjs-backend
+    environment:
+      - ADMIN_KEY=${ADMIN_KEY}
+    volumes:
+      - cap-data:/usr/src/app/.data
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.capjs.rule=Host(`capjs.stacktastic.dev`)"
+      - "traefik.http.routers.capjs.entrypoints=websecure"
+      - "traefik.http.routers.capjs.tls.certresolver=myresolver"
+      - "traefik.http.services.capjs.loadbalancer.server.port=3000"
+    restart: unless-stopped
+
+volumes:
+  cap-data:
+
+networks:
+  web:
+    external: true
